@@ -6,18 +6,36 @@ import os
 import random
 pygame.font.init()
 
+# Window size for game
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
+# Images to be displayed 
 BIRD_IMG = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird1.png"))),pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird2.png"))),pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird3.png")))]
-
 PIPE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","pipe.png")))
-
 BCKGRND_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bg.png")))
 BASE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","base.png")))
+
+# Fonts for displaying the scoore
 STAT_FONT = pygame.font.SysFont('comicsans',50)
 
+# START with a BIRD CLASS to define the the actions of the bird. 
 class Bird:
+    '''
+    To define the bird, we need to define its 
+        - x and y position on the screen
+        - its tilting, (while it goes up and down) to give a more natural look
+        - Velocity : to give the realistic effect of going up slower after a push and going up faster while going down
+        - Image count to keep track of what part of wing flapping we are on
+        - Images to display
+
+    Modules:
+        - jump : Define a jump
+        - move : Birds diplacement on the y axis and its tilting. 
+        - draw : Define which image to be displayed at what tilting and wing condition and display it to the screen
+        - get mask: Used in defining the pixel perfect collision. It was based in the pygame's own modules. 
+    '''
+
     IMGS = BIRD_IMG
     # Constants to use later
     MAX_ROTATION = 25   # rotation of the bird head
@@ -113,6 +131,23 @@ class Bird:
 
 
 class Pipe:
+
+    ''' We need top and bottom pipe. To define both the pipes we need the following:
+
+        - GAP: the distance between the bars. Currently set to fix, can be made alternating for complexity. 
+        - Pipe moving velocity, currently set to fix velocity, can be increased based on complexity.
+        - x position of the pipe along the screen
+        - Position of top and bottom pipe. Since the images are placed based on the top left corner, we need to shift the 
+        top pipe to up for correct positioning.
+
+    Modules:
+        - set_height: Set the y position (height) of the bars. 
+        - move : In this game, bird does not move in x axis but the pipes and the background. So move the pipes 
+        with a fixed velocity.
+        - draw: Display the pipes. 
+        - collide : Test if the bird and pipes are colliding with each other to set game over.      
+    '''
+
     GAP = 200
     VEL = 5
 
@@ -167,6 +202,16 @@ class Pipe:
 
 
 class Base:
+
+    ''' There is a grass at the bottom of the page, that is the base. We need to define: 
+            - How fast the base image moves, should be same with the pipe velocity for smooth motion (remember, the bird only moves up and down)
+            - Base image (with widht measured, since the image is smaller than the whole screen, we are going to need to 
+        duplicate the image and put one after another. )
+        Modules:
+            - move: We need to move the base image along with the pipes to give the impression that bird is flying forward.
+            - draw: Display the base image. 
+    '''
+
     VEL = 5 # needs to be same as pipe velocity
     WIDTH = BASE_IMG.get_width()
     IMG = BASE_IMG
@@ -192,44 +237,75 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
+# We have defined the 3 classes for playing the game:
+    # BIRD, PIPES, BASE now define the functions to display the game and the main function for playing.
+
+
 def draw_window(win,bird, pipes, base, score):
+
+    '''
+    Win is the window from the pygame module, and blit is used to display the given image on a given position.
+    
+    '''
     # blit just draws
     win.blit(BCKGRND_IMG, (0,0))
 
+
+    # There can be more than a single pipe in a given screen, so draw all the pipes 
     for pipe in pipes:
         pipe.draw(win)
 
+    # Render the core on the top right 
     text = STAT_FONT.render("Score: " + str(score),1,(255, 255, 255))
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
 
+    # Draw the base
     base.draw(win)
+
+    # Draw the bird
     bird.draw(win)
 
+    # Update the display with the given blits. 
     pygame.display.update()
 
 
 
 # main loop of the game
 def main():
+    '''
+    Main function that combines the different parts and displays the game
+    Initialize 3 different classes, bird, base, pipes, and initialize the score.
+    '''
+
+
     bird = Bird(230,350)  # start position 
     base = Base(720)
     pipes = [Pipe(700)]
     score = 0
+
+    # Initially there is no pipe
     add_pipe = False
     
     # initialization of the window
     win=pygame.display.set_mode((WIN_WIDTH,WIN_HEIGHT))
     
+    # to set the game speed. 
     clock = pygame.time.Clock()
     
-    
+
+    # The game runs in a loop, and it only breaks if we "hit" either pipes or to the base. 
+
     run = True
     while run:
         clock.tick(30)
+        
+        # If we click to the X to close the game. 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
         
+
+        # Start the bird movement 
         #bird.move()
 
         rem = [] # pipes to be removed
@@ -245,7 +321,7 @@ def main():
                 pipe.passed = True      # Bird passed the pipe position.
                 add_pipe = True
 
-
+            # Move each pipe in the pipes
             pipe.move()
 
         if add_pipe: 
@@ -256,14 +332,20 @@ def main():
         for r in rem:
             pipes.remove(r)
 
+        
+        # Condition to check if we have hit the base
         if bird.y + bird.img.get_width() >= 720:
             pass
 
+
+        # Move the base
         base.move()
         draw_window(win,bird,pipes, base, score)
                 
     pygame.quit()
     quit()
 
+
+# Run the main function
 main()
         
