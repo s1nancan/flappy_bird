@@ -5,9 +5,9 @@ In this project, I have re-created the simple single player game Flappy bird fro
 The user tries to understand the dynamics by trial to see how large the birds jump and how fast it drops if stopped flapping. In this project, instead of user input, I utilized NEAT package to create many birds to learn the dynamics of the game with genetic algorithm, where each genetic iteration the bird reaches farther. 
 
 \bin:
-  *  Bird, pipe and base classes to create different parts of the game
-  *  Constants: The constants and images used in the game
-  *  Utils: The functions that are utilized for the implementation of the game
+   - Bird, pipe and base classes to create different parts of the game
+   - Constants: The constants and images used in the game
+   - Utils: The functions that are utilized for the implementation of the game
 
 - config.txt : Configuration file for the NEAT package
 - environment.yml : Package versions used in the conda environment
