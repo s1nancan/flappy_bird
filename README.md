@@ -11,5 +11,7 @@ The user tries to understand the dynamics by trial to see how large the birds ju
 
 - config.txt : Configuration file for the NEAT package
 - environment.yml : Package versions used in the conda environment
+- imgs : Image files for the game
+- results : An example recording from the game output to demonstrate the training
 - main.py : The main function to run once the repo is cloned to train the AI
 - all_in_one.py: Since this is a relatively small project, everything is combined into a single python file for interested parties. 
